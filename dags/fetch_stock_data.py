@@ -12,7 +12,7 @@ POSTGRES_CONN_ID = 'postgres_default'
 API_CONN_ID = 'alpha_vantage_api'
 
 # List of stock tickers to fetch
-TICKERS = ['AAPL', 'MSFT', 'GOOGL']
+TICKERS = ['AAPL']
 
 default_args = {
     'owner': 'airflow',
