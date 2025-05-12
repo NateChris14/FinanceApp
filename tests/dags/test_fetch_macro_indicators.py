@@ -98,7 +98,15 @@ def test_extract_macro_indicators(mock_airflow_conn, mock_http_hook, mock_variab
     result = extract_macro_indicators.__wrapped__()
 
     assert isinstance(result, dict)
-    for indicator in MACRO_INDICATORS:
+    expected_indicators = [
+        'GDP',
+        'Unemployment Rate',
+        'Inflation Rate',
+        'Interest Rate',
+        'Exchange Rate',
+        '10-Year Treasury Yield'
+    ]
+    for indicator in expected_indicators:
         assert indicator in result
         assert isinstance(result[indicator], list)
         assert len(result[indicator]) > 0
@@ -115,17 +123,29 @@ def test_transform_macro_indicators():
                 'date': '2024-01-01',
                 'value': '100.50'
             }
+        ],
+        '10-Year Treasury Yield': [
+            {
+                'date': '2024-01-01',
+                'value': '4.25'
+            }
         ]
     }
 
     result = transform_macro_indicators.__wrapped__(input_data)
 
     assert isinstance(result, list)
-    assert len(result) == 1
-    record = result[0]
-    assert record['indicator'] == 'GDP'
-    assert record['date'] == '2024-01-01'
-    assert record['value'] == 100.50
+    assert len(result) == 2  # One record for each indicator
+    
+    # Check GDP record
+    gdp_record = next(r for r in result if r['indicator'] == 'GDP')
+    assert gdp_record['date'] == '2024-01-01'
+    assert gdp_record['value'] == 100.50
+    
+    # Check Treasury Yield record
+    treasury_record = next(r for r in result if r['indicator'] == '10-Year Treasury Yield')
+    assert treasury_record['date'] == '2024-01-01'
+    assert treasury_record['value'] == 4.25
 
 def test_load_macro_indicators(mock_postgres_hook):
     """Test the load_macro_indicators task"""

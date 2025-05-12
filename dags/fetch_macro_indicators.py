@@ -44,7 +44,8 @@ with DAG(
             'Unemployment Rate': 'UNRATE',  # Unemployment Rate
             'Inflation Rate': 'CPIAUCSL',  # Consumer Price Index
             'Interest Rate': 'FEDFUNDS',  # Federal Funds Rate
-            'Exchange Rate': 'DEXUSEU'  # USD/EUR Exchange Rate
+            'Exchange Rate': 'DEXUSEU',  # USD/EUR Exchange Rate
+            '10-Year Treasury Yield': 'DGS10'  # 10-Year Treasury Yield
         }
 
         for indicator, series_id in indicator_mapping.items():
