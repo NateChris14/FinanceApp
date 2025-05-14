@@ -1,12 +1,16 @@
-# Use Astro Runtime 12.9.0 (or upgrade to 3.0-2 if needed)
 FROM quay.io/astronomer/astro-runtime:12.9.0
 
-# Switch to root user to install packages
+# Switch to root to install packages
 USER root
 
-# Install bash
-RUN apt-get update && apt-get install -y bash && rm -rf /var/lib/apt/lists/*
+# Install bash explicitly and symlink if needed
+RUN apt-get update && \
+    apt-get install -y bash && \
+    ln -sf /bin/bash /usr/bin/bash && \
+    rm -rf /var/lib/apt/lists/*
 
-# Switch back to astro user for security
+# (Optional) Set bash as the default shell
+SHELL ["/bin/bash", "-c"]
+
+# Switch back to astro user for safety
 USER astro
-
