@@ -27,7 +27,7 @@ jobs:
         with:
           deployment-id: ${{ env.DEPLOYMENT_ID }}
           # Uncomment and set if your project is in a subfolder:
-          root-folder: cd "./STOCK ANOMALY"
+          root-folder: "./STOCK ANOMALY"
 
         env:
           ASTRO_API_TOKEN: ${{ secrets.ASTRO_API_TOKEN }}
