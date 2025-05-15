@@ -19,5 +19,5 @@ jobs:
         uses: astronomer/deploy-action@v0.2
         with:
           deployment-id: cmaohgbys0hf201o56817rfq9
-          root-folder: dags/  # ✅ This should point to your Astro project directory
+
 
