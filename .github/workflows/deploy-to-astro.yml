@@ -1,19 +1,27 @@
-name: Astronomer CI - Deploy code to main Deployment
+name: Astronomer CI - Deploy code
 
 on:
+  workflow_dispatch:
+    inputs:
+      deploymentId:
+        description: "Deployment ID"
+        required: true
+        type: string
+      apiToken:
+        description: "Astro API Token"
+        required: true
+        type: string
   push:
     branches:
       - main
 
 env:
-  ## Set your Workspace API key token as a GitHub secret
-  ASTRO_API_TOKEN: ${{ secrets.ASTRO_API_TOKEN }}
+  ASTRO_API_TOKEN: ${{ inputs.apiToken || secrets.ASTRO_API_TOKEN }}
+  DEPLOYMENT_ID: cmaohgbys0hf201o56817rfq9
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy code to main Deployment
-      uses: astronomer/deploy-action@v0.2
-      with:
-        deployment-id: cmaohgbys0hf201o56817rfq9
+    - name: Deploy to Astro
+      uses: astronomer/deploy-action@v0.4
