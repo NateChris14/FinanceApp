@@ -7,21 +7,26 @@ on:
         description: "Deployment ID"
         required: true
         type: string
-      apiToken:
-        description: "Astro API Token"
-        required: true
-        type: string
   push:
     branches:
       - main
 
 env:
-  ASTRO_API_TOKEN: ${{ inputs.apiToken || secrets.ASTRO_API_TOKEN }}
-  DEPLOYMENT_ID: ${{ inputs.deploymentId || secrets.DEPLOYMENT_ID }}
+  DEPLOYMENT_ID: ${{ github.event.inputs.deploymentId || vars.DEPLOYMENT_ID }}
+  ASTRO_API_TOKEN: ${{ secrets.ASTRO_API_TOKEN }}
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy to Astro
-      uses: astronomer/deploy-action@v0.4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Astro
+        uses: astronomer/deploy-action@v0.4
+        with:
+          deployment-id: ${{ env.DEPLOYMENT_ID }}
+          # Uncomment and set if your project is in a subfolder:
+          root-folder: ./STOCK ANOMALY
+        env:
+          ASTRO_API_TOKEN: ${{ secrets.ASTRO_API_TOKEN }}
