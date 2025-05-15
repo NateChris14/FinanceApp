@@ -18,4 +18,6 @@ jobs:
       - name: Deploy to Astronomer
         uses: astronomer/deploy-action@v0.2
         with:
-          deployment-id: cmapce2yv0olw01o5cysk3962
+          deployment-id: cmaohgbys0hf201o56817rfq9
+          path: ./   # <--- this must point to the root of the Astro project
+
