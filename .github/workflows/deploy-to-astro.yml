@@ -15,9 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Astronomer
+      - name: Deploy to Astronomer with tests
         uses: astronomer/deploy-action@v0.2
         with:
           deployment-id: cmaohgbys0hf201o56817rfq9
+          pytest: tests/    # Run all pytest files under the tests folder
 
 
