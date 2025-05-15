@@ -19,5 +19,5 @@ jobs:
         uses: astronomer/deploy-action@v0.2
         with:
           deployment-id: cmaohgbys0hf201o56817rfq9
-          root-folder: FinanceApp  # ✅ This should point to your Astro project directory
+          root-folder: .  # ✅ This should point to your Astro project directory
 
