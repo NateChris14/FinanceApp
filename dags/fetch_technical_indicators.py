@@ -19,21 +19,7 @@ TICKERS = [
     'GOOGL', # Alphabet Inc. (Google)
     'AMZN',  # Amazon.com Inc.
     'META',  # Meta Platforms Inc. (Facebook)
-    'TSLA',  # Tesla Inc.
     'NVDA',  # NVIDIA Corp.
-    'JPM',   # JPMorgan Chase & Co.
-    'V',     # Visa Inc.
-    'JNJ',   # Johnson & Johnson
-    'WMT',   # Walmart Inc.
-    'PG',    # Procter & Gamble
-    'DIS',   # Walt Disney Co.
-    'MA',    # Mastercard Inc.
-    'HD',    # Home Depot
-    'XOM',   # Exxon Mobil Corp.
-    'PFE',   # Pfizer Inc.
-    'KO',    # Coca-Cola Co.
-    'PEP',   # PepsiCo Inc.
-    'BAC',   # Bank of America
 ]
 
 
