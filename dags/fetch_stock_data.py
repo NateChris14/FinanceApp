@@ -5,6 +5,7 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.utils.dates import days_ago
 from airflow.models import Variable
 import json
+import time
 
 # Configuration
 POSTGRES_CONN_ID = 'postgres_default'
@@ -54,7 +55,7 @@ with DAG(
 
         all_stock_data = {}
 
-        for ticker in TICKERS:
+        for i,ticker in enumerate(TICKERS):
             endpoint = f"/time_series?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}"
 
             response = http_hook.run(endpoint)
@@ -66,6 +67,10 @@ with DAG(
                     raise Exception(f"Invalid data for {ticker}: {data}")
             else:
                 raise Exception(f"Failed to fetch {ticker}: {response.status_code}")
+            
+            # Wait 8 seconds before the next call to stay within limit
+            if i < len(TICKERS) - 1:
+                time.sleep(8)
 
         return all_stock_data
 
