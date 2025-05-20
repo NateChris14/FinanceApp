@@ -3,13 +3,12 @@ from airflow.decorators import task
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.utils.dates import days_ago
-import json
-import requests
 from airflow.models import Variable
+import json
 
 # Configuration
 POSTGRES_CONN_ID = 'postgres_default'
-API_CONN_ID = 'alpha_vantage_api'
+API_CONN_ID = 'twelvedata_api'  # Make sure this Airflow HTTP connection exists
 
 # List of stock tickers to fetch
 TICKERS = [
@@ -35,15 +34,13 @@ TICKERS = [
     'BAC',   # Bank of America
 ]
 
-
-
 default_args = {
     'owner': 'airflow',
     'start_date': days_ago(1)
 }
 
 with DAG(
-    dag_id='stock_data_etl',
+    dag_id='stock_data_etl_twelvedata',
     default_args=default_args,
     schedule_interval='@daily',
     catchup=False
@@ -51,49 +48,45 @@ with DAG(
 
     @task()
     def extract_stock_data():
-        """Extract stock data from Alpha Vantage API using Airflow Connection."""
-        # Get API key from Airflow Variables
-        api_key = Variable.get("ALPHA_VANTAGE_API_KEY")
-        
+        """Extract stock data from Twelve Data API."""
+        api_key = Variable.get("TWELVEDATA_API_KEY")
         http_hook = HttpHook(http_conn_id=API_CONN_ID, method='GET')
-        
+
         all_stock_data = {}
+
         for ticker in TICKERS:
-            # Build the API endpoint
-            endpoint = f'/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={api_key}&outputsize=compact'
-            
-            # Make the request via the HTTP Hook
+            endpoint = f"/time_series?symbol={ticker}&interval=1day&apikey={api_key}&outputsize=100"
+
             response = http_hook.run(endpoint)
-            
             if response.status_code == 200:
                 data = response.json()
-                if 'Time Series (Daily)' in data:
-                    all_stock_data[ticker] = data['Time Series (Daily)']
+                if "values" in data:
+                    all_stock_data[ticker] = data["values"]
                 else:
-                    raise Exception(f"Invalid data format for {ticker}")
+                    raise Exception(f"Invalid data for {ticker}: {data}")
             else:
-                raise Exception(f"Failed to fetch stock data for {ticker}: {response.status_code}")
-        
+                raise Exception(f"Failed to fetch {ticker}: {response.status_code}")
+
         return all_stock_data
 
     @task()
     def transform_stock_data(stock_data):
-        """Transform the extracted stock data."""
+        """Transform Twelve Data stock data to a flat list."""
         transformed_data = []
-        
-        for ticker, time_series in stock_data.items():
-            for date, values in time_series.items():
+
+        for ticker, values in stock_data.items():
+            for entry in values:
                 transformed_record = {
                     'ticker': ticker,
-                    'date': date,
-                    'open': float(values['1. open']),
-                    'high': float(values['2. high']),
-                    'low': float(values['3. low']),
-                    'close': float(values['4. close']),
-                    'volume': int(values['5. volume'])
+                    'date': entry['datetime'].split(' ')[0],
+                    'open': float(entry['open']),
+                    'high': float(entry['high']),
+                    'low': float(entry['low']),
+                    'close': float(entry['close']),
+                    'volume': int(entry['volume'])
                 }
                 transformed_data.append(transformed_record)
-        
+
         return transformed_data
 
     @task()
@@ -103,7 +96,7 @@ with DAG(
         conn = pg_hook.get_conn()
         cursor = conn.cursor()
 
-        # Create table if it doesn't exist
+        # Create table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS stock_data (
             ticker VARCHAR(10),
@@ -118,7 +111,7 @@ with DAG(
         );
         """)
 
-        # Insert transformed data into the table
+        # Insert/update data
         for record in transformed_data:
             cursor.execute("""
             INSERT INTO stock_data (ticker, date, open, high, low, close, volume)
@@ -143,7 +136,7 @@ with DAG(
         cursor.close()
         conn.close()
 
-    # DAG Workflow - ETL Pipeline
+    # DAG Workflow
     stock_data = extract_stock_data()
     transformed_data = transform_stock_data(stock_data)
     load_stock_data(transformed_data)
