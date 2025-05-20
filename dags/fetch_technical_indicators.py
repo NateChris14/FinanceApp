@@ -65,7 +65,7 @@ with DAG(
             all_technical_indicators[ticker] = {}
 
             # Build the API endpoint for RSI
-            endpoint_rsi = f'/rsi?symbol={ticker}&interval=1day&time_period=14&apikey={api_key}'
+            endpoint_rsi = f'/rsi?symbol={ticker}&interval=1day&time_period=14&start_date=2023-01-01&apikey={api_key}'
             response_rsi = http_hook.run(endpoint_rsi)
 
             if response_rsi.status_code == 200:
@@ -80,7 +80,7 @@ with DAG(
             time.sleep(12)
 
             # Build the API endpoint for MACD
-            endpoint_macd = f'/macd?symbol={ticker}&interval=1day&apikey={api_key}'
+            endpoint_macd = f'/macd?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}'
             response_macd = http_hook.run(endpoint_macd)
 
             if response_macd.status_code == 200:
@@ -95,7 +95,7 @@ with DAG(
             time.sleep(12)
 
             # Build the API endpoint for SMA
-            endpoint_sma = f'/sma?symbol={ticker}&interval=1day&time_period=20&apikey={api_key}'
+            endpoint_sma = f'/sma?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}'
             response_sma = http_hook.run(endpoint_sma)
 
             if response_sma.status_code == 200:
@@ -110,7 +110,7 @@ with DAG(
             time.sleep(12)
 
             # Build the API endpoint for EMA
-            endpoint_ema = f'/ema?symbol={ticker}&interval=1day&time_period=20&apikey={api_key}'
+            endpoint_ema = f'/ema?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}'
             response_ema = http_hook.run(endpoint_ema)
 
             if response_ema.status_code == 200:
@@ -125,7 +125,7 @@ with DAG(
             time.sleep(12)
 
             # Build the API endpoint for ATR
-            endpoint_atr = f'/atr?symbol={ticker}&interval=1day&time_period=14&apikey={api_key}'
+            endpoint_atr = f'/atr?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}'
             response_atr = http_hook.run(endpoint_atr)
 
             if response_atr.status_code == 200:
@@ -140,7 +140,7 @@ with DAG(
             time.sleep(12)
 
             # Build the API endpoint for Bollinger Bands
-            endpoint_bbands = f'/bbands?symbol={ticker}&interval=1day&time_period=20&apikey={api_key}'
+            endpoint_bbands = f'/bbands?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}'
             response_bbands = http_hook.run(endpoint_bbands)
 
             if response_bbands.status_code == 200:
