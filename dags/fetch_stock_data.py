@@ -55,7 +55,7 @@ with DAG(
         all_stock_data = {}
 
         for ticker in TICKERS:
-            endpoint = f"/time_series?symbol={ticker}&interval=1day&apikey={api_key}&outputsize=100"
+            endpoint = f"/time_series?symbol={ticker}&interval=1day&start_date=2023-01-01&apikey={api_key}"
 
             response = http_hook.run(endpoint)
             if response.status_code == 200:
