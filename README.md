@@ -27,6 +27,8 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
 - **Orchestration**: Apache Airflow (Astronomer Runtime)
 - **Testing**: Pytest (see `tests/`)
 
+![ETL Architecture](https://github.com/NateChris14/FinanceApp/blob/main/ETL%20Pipeline%20Architecture.png)
+
 ## Prerequisites
 
 - [Docker](https://www.docker.com/get-started)
