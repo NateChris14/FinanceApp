@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project, **stock-anomaly**, is a data engineering pipeline built with Apache Airflow. It automates the extraction, transformation, and loading (ETL) of financial data, including stock prices, technical indicators, and macroeconomic indicators, into a PostgreSQL database. The project is designed for robust, production-grade data workflows and is deployable both locally (via Docker Compose) and on [Astronomer](https://www.astronomer.io/).
+**stock-anomaly** is a data engineering pipeline built with Apache Airflow that automates the extraction, transformation, and loading (ETL) of financial data—stock prices, technical indicators, and macroeconomic indicators—into PostgreSQL. The pipeline runs locally via Docker/Astro CLI and can be deployed to [Astronomer](https://www.astronomer.io/).
 
 ## Features
 
@@ -11,7 +11,7 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
   - Stock prices from Twelve Data and Alpha Vantage APIs
   - Technical indicators (RSI, MACD, SMA, EMA, ATR, Bollinger Bands) from Twelve Data
   - Macroeconomic indicators (GDP, Unemployment Rate, Inflation, Interest Rate, Exchange Rate, Treasury Yield) from the Federal Reserve (FRED)
-- **PostgreSQL Integration**: All data is loaded into a managed PostgreSQL instance.
+- **PostgreSQL Integration**: PostgreSQL sink (local dev via Docker, production via AWS RDS).
 - **Modular DAGs**: Each data domain has its own Airflow DAG for maintainability and scalability.
 - **CI/CD Integration**: Automated deployment and testing via GitHub Actions and Astronomer.
 - **Comprehensive Testing**: Pytest-based unit and integration tests for all DAGs and tasks.
@@ -23,7 +23,7 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
   - `fetch_time_series_data.py`: ETL for daily time series from Alpha Vantage
   - `fetch_technical_indicators.py`: ETL for technical indicators from Twelve Data
   - `fetch_macro_indicators.py`: ETL for macroeconomic indicators from FRED
-- **Database**: PostgreSQL (Dockerized)
+- **Database**: PostgreSQL (AWS RDS in production; Dockerized Postgres for local development)
 - **Orchestration**: Apache Airflow (Astronomer Runtime)
 - **Testing**: Pytest (see `tests/`)
 
@@ -35,12 +35,23 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
 - [Docker Compose](https://docs.docker.com/compose/)
 - [Astronomer CLI](https://docs.astronomer.io/astro/cli/install-cli) (for Astronomer deployment)
 
+## Database (AWS RDS)
+
+The project’s primary database is hosted on **AWS RDS for PostgreSQL** for production usage.
+
+To run against RDS, create/configure an Airflow Connection for Postgres (`postgres_default`) and set:
+- Host (RDS endpoint), Port (usually 5432)
+- Database name
+- Username/password
+
+Tip: keep RDS credentials in Astronomer/Airflow secrets or environment variables rather than committing them to the repo.
+
 ## Setup & Local Development
 
 1. **Clone the repository:**
    ```sh
-   git clone <your-repo-url>
-   cd <repo-directory>
+   git clone https://github.com/NateChris14/FinanceApp.git
+   cd FinanceApp
    ```
 
 2. **Configure Environment Variables:**
@@ -52,20 +63,29 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
      - `twelvedata_api`
      - `alpha_vantage_api`
      - `federal_reserve_api`
+   - PostgreSQL connection (local):
+     - `database` : postgres db name (default: postgres)
+     - `user` : user name (default: postgres)
+     - `password` : postgres password (default: postgres14)
+     - `host` : local docker uri (local) or aws rds uri (production)
+     - `port` : 5432
+     - `connection type` : postgres
 
-3. **Start PostgreSQL (Docker Compose):**
+3. **Local PostgreSQL (optional):**
+   If you don’t want to use AWS RDS for local development, start the local PostgreSQL container:
+
    ```sh
    docker-compose up -d
    ```
-   This will start a local PostgreSQL instance on port 5432 with default credentials (`postgres`/`postgres14`).
+   Credentials and port are defined in docker-compose.yml. Treat these as development-only values and change them for any real deployment.
 
-4. **Build and Start Airflow (Astronomer Runtime):**
+5. **Build and Start Airflow (Astronomer Runtime):**
    ```sh
    astro dev start
    ```
    This will build the Airflow image (using the provided `Dockerfile`) and start all necessary services.
 
-5. **Access Airflow UI:**
+6. **Access Airflow UI:**
    - Navigate to [http://localhost:8080](http://localhost:8080) in your browser.
    - Default credentials: `admin` / `admin` (unless changed).
 
@@ -77,7 +97,8 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
 - **System Packages:**
   - None required by default (`packages.txt` is empty)
 - **Database Credentials:**
-  - Set in `docker-compose.yml` (can be customized as needed)
+  - Local dev: set in docker-compose.yml
+  - Production: configure via Airflow Connection + Astronomer secrets/env vars (AWS RDS)
 
 ## Running Tests
 
@@ -96,7 +117,9 @@ This project, **stock-anomaly**, is a data engineering pipeline built with Apach
 ### Astronomer Cloud Deployment
 - This project includes a GitHub Actions workflow for CI/CD (`.github/workflows/deploy-to-astro.yml`).
 - On every push to `main`, code is automatically tested and deployed to Astronomer.
-- Ensure your Astronomer deployment is configured with the required API keys and connections.
+- Ensure your Astronomer deployment is configured with:
+  - Required API keys (as env vars / variables)
+  - A PostgreSQL connection pointing to AWS RDS (host, db, user, password)
 
 ## Project Structure
 
