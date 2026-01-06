@@ -29,6 +29,40 @@
 
 ![ETL Architecture](https://github.com/NateChris14/FinanceApp/blob/main/ETL%20Pipeline%20Architecture.png)
 
+## Database schema (source of truth)
+
+This ETL pipeline loads curated market, technical, and macroeconomic datasets into PostgreSQL (hosted on AWS RDS in production). [file:55]  
+The schema is designed around daily time-series keyed by `(ticker, date)` for equity data and `(indicator, date)` for macro series. [file:89]
+
+### ER diagrams
+- Conceptual design: ![Conceptual DB design](https://github.com/NateChris14/FinanceApp/blob/main/Stock%20data%20DB-Conceptual%20design.drawio.png) [file:88]
+- Logical design: ![Logical DB design](https://github.com/NateChris14/FinanceApp/blob/main/Stock%20data%20DB-Logical%20Design.drawio.png) [file:89]
+
+### Tables
+
+#### `stock_data`
+Daily OHLCV per ticker. [file:89]  
+- Primary key: `(ticker, date)` [file:89]
+- Columns: `open`, `high`, `low`, `close`, `volume`, `ingested_at` [file:89]
+
+#### `technical_indicators`
+Daily derived indicators per ticker (e.g., RSI, MACD, moving averages, ATR, Bollinger Bands). [file:89]  
+- Primary key: `(ticker, date)` [file:89]
+- Columns: `rsi`, `macd`, `sma`, `ema`, `atr`, `bb_upper`, `bb_middle`, `bb_lower` [file:89]
+
+#### `macro_indicators`
+Daily (or latest-available) macro series values keyed by indicator name and date. [file:89]  
+- Primary key: `(indicator, date)` [file:89]
+- Columns: `value` [file:89]
+
+### Relationships and join keys
+- `stock_data` joins to `technical_indicators` on `(ticker, date)` to combine prices with indicators for the same symbol and day. [file:88][file:89]  
+- `macro_indicators` joins to ticker-level datasets on `date` for time-aligned macro context (indicator-level dimension is `indicator`). [file:88][file:89]
+
+### Notes for consumers
+Downstream applications should treat these tables as the canonical interface produced by the ETL pipeline and avoid writing to them directly. [file:89]
+
+
 ## Prerequisites
 
 - [Docker](https://www.docker.com/get-started)
