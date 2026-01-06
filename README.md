@@ -35,8 +35,8 @@ This ETL pipeline loads curated market, technical, and macroeconomic datasets in
 The schema is designed around daily time-series keyed by `(ticker, date)` for equity data and `(indicator, date)` for macro series. [file:89]
 
 ### ER diagrams
-- Conceptual design: ![Conceptual DB design](https://github.com/NateChris14/FinanceApp/blob/main/Stock%20data%20DB-Conceptual%20design.drawio.png) [file:88]
-- Logical design: ![Logical DB design](https://github.com/NateChris14/FinanceApp/blob/main/Stock%20data%20DB-Logical%20Design.drawio.png) [file:89]
+![Conceptual DB design](https://github.com/NateChris14/FinanceApp/blob/main/Stock%20data%20DB-Conceptual%20design.drawio.png) [file:88]
+![Logical DB design](https://github.com/NateChris14/FinanceApp/blob/main/Stock%20data%20DB-Logical%20Design.drawio.png) [file:89]
 
 ### Tables
 
